@@ -60,7 +60,7 @@ dirs = ['historical', 'future'] ## gfdl-reanalysis is historical only ### CHECK 
 fishing = ['no-fishing']
 
 sub_dirs_h = ["hist"]
-sub_dirs_f = ["rcp2p6", "rcp4p5", "rcp6p0", "rcp8p5"] #sub_dirs_f = ["rcp2p6", "rcp4p5", "rcp6p0", "rcp8p5"]
+sub_dirs_f = ["rcp2p6", "rcp8p5"] #sub_dirs_f = ["rcp2p6", "rcp4p5", "rcp6p0", "rcp8p5"]
 sub_dirs = [sub_dirs_h, sub_dirs_f]
 
 vars_nf = ["b10cm_", "b30cm_", "tcb_"]
