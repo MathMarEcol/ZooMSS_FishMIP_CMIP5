@@ -5,43 +5,40 @@ library(lubridate)
 # /work/bb0820/ISIMIP/ISIMIP2b/UploadArea/marine-fishery_global/ZooMSS/_tmp
 
 
-#dbem_cesm1-bgc_nobc_historical_nosoc_co2_tcb_global_annual_1860-2005.nc
-# ZooMSS_IPSL-CM5A-LR_nobc_historical_nat_default_tcb_global_annual_1961-2016.nc
-
+#FILENAME EXAMPLE
+# macroecological_gfdl-esm2m_nobc_rcp2p6_wo-diaz_no-fishing_no-oa_b10cm_global_annual_2006_2100.nc4
+#          zoomss_gfdl-esm2m_nobc_rcp26_wo-diaz_no-fishing_no-oa_b10cm_global_annual_2006_2100.nc4
 
 base_dir <- paste0("~",.Platform$file.sep,
-                           "Nextcloud",.Platform$file.sep,
-                           "MME2Work",.Platform$file.sep,
-                           "FishMIP",.Platform$file.sep,
-                           "CMIP5")
+                   "Nextcloud",.Platform$file.sep,
+                   "MME2Work",.Platform$file.sep,
+                   "FishMIP",.Platform$file.sep,
+                   "CMIP5")
 
-o_Model <- "ZooMSS"
-o_Forcing <- c("IPSL-CM5A-LR", "GFDL-ESM2M")
+o_modelname <- "ZooMSS"
+o_gcm <- c("IPSL-CM5A-LR", "GFDL-ESM2M")
+o_biascorrection <- "nobc"
+o_climatescenario <- c("historical", "rcp26", "rcp85")
+o_socscenario <- "wo-diaz_no-fishing"
+o_co2sensscenarios <- "no-oa"
+o_variable <- c("tsb", "tpb", "tcb", "b10cm", "b30cm")
+o_region <- "global"
+o_timestep <- "annual"
 
-o_Bias <- "nobc"
-o_Scenario <- c("historical", "rcp26", "rcp85")
-o_Soc <- "nat"
-o_Sens <- "default"
-o_Variable <- c("tsb", "tpb", "tcb", "b10cm", "b30cm")
-o_Region <- "global"
-o_TempRes <- "annual"
 
+for (m in 1:length(o_gcm)){
 
-for (m in 1:length(o_Forcing)){
+  for (s in 1:length(o_climatescenario)){
 
-  for (s in 1:length(o_Scenario)){
-
-    file <- list.files(path = paste0(base_dir, .Platform$file.sep, "Output"), pattern = paste0(o_Forcing[m], "_", o_Scenario[s]), full.names = TRUE)
+    file <- list.files(path = paste0(base_dir, .Platform$file.sep, "Output"), pattern = paste0(o_gcm[m], "_", o_climatescenario[s]), full.names = TRUE)
 
     for (f in 1:length(file)){
 
       dat <- read_rds(file[f])
-
       dat$days <- as.numeric(dat$time - as_date("1850-01-01"))
 
-        lon <- -179.5:179.5
-        lat <- -89.5:89.5
-
+      lon <- -179.5:179.5
+      lat <- -89.5:89.5
       days <- sort(unique(dat$days))
 
       full_res <- crossing(lon, lat, days)
@@ -65,8 +62,8 @@ for (m in 1:length(o_Forcing)){
                     units = "g C m-2")
 
       b10cm <- tibble(array = array(out$b10cm, dim=c(length(lon), length(lat), length(days))),
-                       name = "Biomass of consumers >10cm",
-                       units = "g C m-2")
+                      name = "Biomass of consumers >10cm",
+                      units = "g C m-2")
 
       b30cm <- tibble(array = array(out$b30cm, dim=c(length(lon), length(lat), length(days))),
                       name = "Biomass of consumers >30cm",
@@ -82,18 +79,18 @@ for (m in 1:length(o_Forcing)){
       # define variables
       fillvalue <- 1e20
 
-      for (v in 1:length(o_Variable)){
+      for (v in 1:length(o_variable)){
 
-        o_file <- str_to_lower(paste0(o_Model, "_", o_Forcing[m], "_", o_Bias, "_",
-                         o_Scenario[s], "_", o_Soc, "_", o_Sens, "_",
-                         o_Variable[v], "_", o_Region, "_", o_TempRes, "_",
-                         min(year(dat$time)), "_", max(year(dat$time)),".nc"))
+        o_file <- str_to_lower(paste0(o_modelname, "_", o_gcm[m], "_", o_biascorrection, "_",
+                                      o_climatescenario[s], "_", o_socscenario, "_", o_co2sensscenarios, "_",
+                                      o_variable[v], "_", o_region, "_", o_timestep, "_",
+                                      min(year(dat$time)), "_", max(year(dat$time)),".nc4"))
 
         o_file <- paste0(base_dir, .Platform$file.sep, "Output", .Platform$file.sep, o_file)
 
-        var <- eval(parse(text = o_Variable[v]))
+        var <- eval(parse(text = o_variable[v]))
 
-        def = ncvar_def(name = o_Variable[v], units = var$units, dim = list(londim, latdim, timedim), missval = fillvalue, longname = var$name, prec="double")
+        def = ncvar_def(name = o_variable[v], units = var$units, dim = list(londim, latdim, timedim), missval = fillvalue, longname = var$name, prec="double")
 
         # create netCDF
         ncout <- nc_create(o_file, def, force_v4=TRUE)
