@@ -54,13 +54,14 @@ for i in range(0, 180):
 ###########################################
 model = ['ZooMSS']    
 
-roots = ['/mnt/lustre01/work/bb0820/ISIMIP/ISIMIP2b/OutputData/marine-fishery_global/ZooMSS/', '/mnt/lustre01/work/bb0820/ISIMIP/ISIMIP2a/OutputData/marine-fishery_global/ZooMSS/', '/mnt/lustre01/work/bb0820/ISIMIP/ISIMIP2b/OutputData/marine-fishery_global/ZooMSS/']
+root = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/"
+#roots = ['/mnt/lustre01/work/bb0820/ISIMIP/ISIMIP2b/OutputData/marine-fishery_global/ZooMSS/', '/mnt/lustre01/work/bb0820/ISIMIP/ISIMIP2a/OutputData/marine-fishery_global/ZooMSS/', '/mnt/lustre01/work/bb0820/ISIMIP/ISIMIP2b/OutputData/marine-fishery_global/ZooMSS/']
 run = ['ipsl-cm5a-lr', 'gfdl-esm2m'] #run = ['ipsl-cm5a-lr','gfdl-reanalysis', 'gfdl-esm2m']
 dirs = ['historical', 'future'] ## gfdl-reanalysis is historical only ### CHECK THIS WITH RYAN ONLY
 fishing = ['no-fishing']
 
 sub_dirs_h = ["hist"]
-sub_dirs_f = ["rcp2p6", "rcp8p5"] #sub_dirs_f = ["rcp2p6", "rcp4p5", "rcp6p0", "rcp8p5"]
+sub_dirs_f = ["rcp26", "rcp85"] #sub_dirs_f = ["rcp2p6", "rcp4p5", "rcp6p0", "rcp8p5"]
 sub_dirs = [sub_dirs_h, sub_dirs_f]
 
 vars_nf = ["b10cm_", "b30cm_", "tcb_"]
@@ -69,18 +70,14 @@ vars_main = [vars_nf]
 vars_names_nf = ["b10cm", "b30cm", "tcb"]
 vars_names_main = [vars_names_nf]
 
-storage_root = "/Users/jason/Nextcloud/MME2Work/ZooMSS/_LatestModel/20201020_CMIP5_Matrix" # storage_root = "/pf/b/b380694/Regional/Output_Data/Macroecological" # Assuming function is run from home directory
+storage_root = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Output" # storage_root = "/pf/b/b380694/Regional/Output_Data/Macroecological" # Assuming function is run from home directory
 storage_run = ['ipsl-cm5a-lr','gfdl-esm2m'] # storage_run = ['ipsl-cm5a-lr','gfdl-reanalysis', 'gfdl-esm2m']
-storage_fishing = ['no-fishing']
+storage_fishing = 'no-fishing'
 
 for f in range(0, len(run)):
     curr_run = run[f]
-    root = roots[f]
     
-    if curr_run == 'gfdl-reanalysis':
-        this_dirs = ['historical']
-    else:
-        this_dirs = dirs
+    this_dirs = dirs
 
     for h in range(0, len(this_dirs)): # Loop over historical or future scenarios
         curr_dir = this_dirs[h]
@@ -124,7 +121,7 @@ for f in range(0, len(run)):
         
                         for n in range(0, num_time): # Loop over time
                             perc_comp = str(round(100*n/num_time, 2))
-                            print("Now working on " + curr_var_name + 'with climate forcing ' + curr_run + ' for model ' + model[0] + ", under climate forcing " + curr_clim \
+                            print("Now working on " + curr_var_name + ' with climate forcing ' + curr_run + ' for model ' + model[0] + ", under climate forcing " + curr_clim \
                                   + ", for the " + curr_area_name + ', under a ' + fishing[j] + ' scenario' + \
                                   ' (' + perc_comp + '%)')
 
@@ -169,7 +166,7 @@ for f in range(0, len(run)):
                     replacing = curr_var_name + '_global'
                     file_name = bit_name.replace(replacing, curr_area_name) + '.csv'
                 
-                    csv_file_name = storage_root + '/' + storage_run[f] + '/' + storage_fishing[j] + '/' + file_name
+                    csv_file_name = storage_root + '/' + storage_run[f] + '/' + file_name
                 
                     # Save file
                     temp_frame.to_csv(csv_file_name, index = False)
