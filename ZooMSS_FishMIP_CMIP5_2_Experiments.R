@@ -92,7 +92,7 @@ for (f in 1:length(files)){
            Chl_log10_ZooMSS = BioSum_df$Chl_log10[cellID],
            SST_ZooMSS = BioSum_df$SST[cellID])
 
-  write_rds(nc, paste0(base_dir, "Output", .Platform$file.sep, str_replace(files[f],".rds", "_withZooMSS.rds"))) # Save to RDM
+  write_rds(nc, paste0(base_dir, "Input", .Platform$file.sep, str_replace(files[f],".rds", "_withZooMSS.rds"))) # Save to RDM
   rm(nc, out)
 }
 
