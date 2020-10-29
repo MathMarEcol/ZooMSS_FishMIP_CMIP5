@@ -5,6 +5,21 @@ library(rnaturalearth)
 library(patchwork)
 library(lubridate)
 
+source("fZooMSS_Xtras.R")
+res <- read_rds("/Users/jason/Nextcloud/MME2Work/ZooMSS/_LatestModel/20201016_CMIP5_Matrix/Output/res_20201016_CMIP5_Matrix.RDS")
+enviro <- read_rds("/Users/jason/Nextcloud/MME2Work/ZooMSS/_LatestModel/20201016_CMIP5_Matrix/enviro_CMIP5_Matrix.RDS")
+mdl <- read_rds("~/Nextcloud/MME2Work/ZooMSS/_LatestModel/20201016_CMIP5_Matrix/Output/model_20201016_CMIP5_Matrix.RDS")
+w <- mdl$param$w
+carbon <- mdl$param$Groups$Carbon
+
+Bio <- fZooMSS_CarbonBiomass(res, w, carbon) # Convert to carbon biomass
+enviro$BioSum <- fZooMSS_SumAll(Bio) # Sum the species
+
+graphics.off()
+x11(width = 6, height = 6)
+ggplot(data = enviro, mapping = aes(x = (chlo), y = (BioSum), colour = sst)) +
+  geom_point()
+ggsave("Figures/ZooMSS_ChlRelationship.pdf")
 
 var <- c("tpb", "tcb", "b10cm", "b10cm")
 
@@ -52,7 +67,6 @@ plotGlobalChange <- function(x, y, tit, w_sf, clim){
 
   return(gg)
 }
-
 
 plotGlobalYear <- function(dat, tit, w_sf){
 
@@ -124,57 +138,38 @@ for(v in 1:length(var)){
   gg_ts <- list()
   clim <- c(-50, 50)
 
-  ### PI
-  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_gfdl-esm4_nobc_picontrol_nat_default_",var[v],"_global_annual_1950-2014.nc"))
-  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_gfdl-esm4_nobc_picontrol_nat_default_",var[v],"_global_annual_2015-2100.nc"))
-  tit <- paste0("GFDL PRE-INDUSTRIAL ",var[v]," (1950-2100 Change)")
+  ### RCP26
+  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/gfdl-esm2m/historical/zoomss_gfdl-esm2m_nobc_historical_wo-diaz_no-fishing_no-oa_",var[v],"_global_annual_1950_2005.nc4"))
+  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/gfdl-esm2m/future/zoomss_gfdl-esm2m_nobc_rcp26_wo-diaz_no-fishing_no-oa_",var[v],"_global_annual_2006_2100.nc4"))
+  tit <- paste0("GFDL RCP2p6 ",var[v]," (1950-2100 Change)")
   gg_map[[1]] <- plotGlobalChange(hist, fut, tit, world_sf, clim)
   gg_ts[[1]] <- plotTimeseries(hist, fut, tit)
-  gg_map2100[[1]] <- plotGlobalYear(hist[[1]], str_remove(tit,"-2100 Change"), world_sf)
-  gg_map2100[[3]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
+  gg_map2100[[1]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
   rm(hist, fut)
 
-  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_ipsl-cm6a-lr_nobc_picontrol_nat_default_",var[v],"_global_annual_1950-2014.nc"))
-  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_ipsl-cm6a-lr_nobc_picontrol_nat_default_",var[v],"_global_annual_2015-2100.nc"))
-  tit <- paste0("IPSL PRE-INDUSTRIAL ",var[v]," (1950-2100 Change)")
+  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/ipsl-cm5a-lr/historical/zoomss_ipsl-cm5a-lr_nobc_historical_wo-diaz_no-fishing_no-oa_",var[v],"_global_annual_1950_2005.nc4"))
+  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/ipsl-cm5a-lr/future/zoomss_ipsl-cm5a-lr_nobc_rcp26_wo-diaz_no-fishing_no-oa_",var[v],"_global_annual_2006_2100.nc4"))
+  tit <- paste0("IPSL RCP2p6 ",var[v]," (1950-2100 Change)")
   gg_map[[2]] <- plotGlobalChange(hist, fut, tit, world_sf, clim)
   gg_ts[[2]] <- plotTimeseries(hist, fut, tit)
-  gg_map2100[[2]] <- plotGlobalYear(hist[[1]], str_remove(tit,"-2100 Change"), world_sf)
-  gg_map2100[[4]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
-  rm(hist, fut)
-
-  ### SSP126
-  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_gfdl-esm4_nobc_historical_nat_default_",var[v],"_global_annual_1950-2014.nc"))
-  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_gfdl-esm4_nobc_ssp126_nat_default_",var[v],"_global_annual_2015-2100.nc"))
-  tit <- paste0("GFDL SSP126 ",var[v]," (1950-2100 Change)")
-  gg_map[[3]] <- plotGlobalChange(hist, fut, tit, world_sf, clim)
-  gg_ts[[3]] <- plotTimeseries(hist, fut, tit)
-  gg_map2100[[5]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
-  rm(hist, fut)
-
-  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_ipsl-cm6a-lr_nobc_historical_nat_default_",var[v],"_global_annual_1950-2014.nc"))
-  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_ipsl-cm6a-lr_nobc_ssp126_nat_default_",var[v],"_global_annual_2015-2100.nc"))
-  tit <- paste0("IPSL SSP126 ",var[v]," (1950-2100 Change)")
-  gg_map[[4]] <- plotGlobalChange(hist, fut, tit, world_sf, clim)
-  gg_ts[[4]] <- plotTimeseries(hist, fut, tit)
-  gg_map2100[[6]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
+  gg_map2100[[2]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
   rm(hist, fut)
 
   ### SSP585
-  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_gfdl-esm4_nobc_historical_nat_default_",var[v],"_global_annual_1950-2014.nc"))
-  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_gfdl-esm4_nobc_ssp585_nat_default_",var[v],"_global_annual_2015-2100.nc"))
-  tit <- paste0("GFDL SSP585 ",var[v]," (1950-2100 Change)")
-  gg_map[[5]] <- plotGlobalChange(hist, fut, tit, world_sf, clim)
-  gg_ts[[5]] <- plotTimeseries(hist, fut, tit)
-  gg_map2100[[7]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
+  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/gfdl-esm2m/historical/zoomss_gfdl-esm2m_nobc_historical_wo-diaz_no-fishing_no-oa_",var[v],"_global_annual_1950_2005.nc4"))
+  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/gfdl-esm2m/future/zoomss_gfdl-esm2m_nobc_rcp85_wo-diaz_no-fishing_no-oa_",var[v],"_global_annual_2006_2100.nc4"))
+  tit <- paste0("GFDL RCP8p5 ",var[v]," (1950-2100 Change)")
+  gg_map[[3]] <- plotGlobalChange(hist, fut, tit, world_sf, clim)
+  gg_ts[[3]] <- plotTimeseries(hist, fut, tit)
+  gg_map2100[[3]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
   rm(hist, fut)
 
-  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_ipsl-cm6a-lr_nobc_historical_nat_default_",var[v],"_global_annual_1950-2014.nc"))
-  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ZooMSS_ipsl-cm6a-lr_nobc_ssp585_nat_default_",var[v],"_global_annual_2015-2100.nc"))
-  tit <- paste0("IPSL SSP585 ",var[v]," (1950-2100 Change)")
-  gg_map[[6]] <- plotGlobalChange(hist, fut, tit, world_sf, clim)
-  gg_ts[[6]] <- plotTimeseries(hist, fut, tit)
-  gg_map2100[[8]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
+  hist <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/ipsl-cm5a-lr/historical/zoomss_ipsl-cm5a-lr_nobc_historical_wo-diaz_no-fishing_no-oa_",var[v],"_global_annual_1950_2005.nc4"))
+  fut <- stack(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Output/ipsl-cm5a-lr/future/zoomss_ipsl-cm5a-lr_nobc_rcp85_wo-diaz_no-fishing_no-oa_",var[v],"_global_annual_2006_2100.nc4"))
+  tit <- paste0("IPSL RCP8p5 ",var[v]," (1950-2100 Change)")
+  gg_map[[4]] <- plotGlobalChange(hist, fut, tit, world_sf, clim)
+  gg_ts[[4]] <- plotTimeseries(hist, fut, tit)
+  gg_map2100[[4]] <- plotGlobalYear(fut[[86]], str_replace(tit,"1950-2100 Change", "2100"), world_sf)
   rm(hist, fut)
 
 
@@ -194,7 +189,7 @@ for(v in 1:length(var)){
 
   ### 2100 Map ###
   graphics.off()
-  x11(width = 12, height = 12)
+  x11(width = 12, height = 6)
   wrap_plots(gg_map2100, ncol = 2)
   ggsave(paste0("Figures/ZooMSS_Map2100_",var[v],".pdf"))
 }
@@ -202,12 +197,10 @@ for(v in 1:length(var)){
 
 
 ## Now look at Chlorophyll
-
-
 plotChlTimeseries <- function(d1, d2, tit){
 
   dat <- rbind(d1, d2) %>%
-    dplyr::select(-(EuclideanDist:bp90cm)) %>%
+    dplyr::select(-(EuclideanDist:SST_ZooMSS)) %>%
     group_by(year) %>%
     summarise(Chl = 10^(mean(Chl_log10, na.rm = TRUE)),
               .groups = "keep") %>%
@@ -227,42 +220,28 @@ plotChlTimeseries <- function(d1, d2, tit){
   return(gg)
 }
 
-
-gg_chl <- list()
-d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/gfdl-esm4_picontrol_tos_onedeg_global_annual_1950_2014_withZooMSS.rds")
-d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/gfdl-esm4_picontrol_tos_onedeg_global_annual_2015_2100_withZooMSS.rds")
-tit <- "GFDL PRE-INDUSTRIAL Chl (1950-2100 Change)"
+d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Input/Oyr_GFDL-ESM2M_historical_r1i1p1_onedeg_1950-2005_withZooMSS.rds")
+d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Input/Oyr_GFDL-ESM2M_rcp26_r1i1p1_onedeg_2006-2100_withZooMSS.rds")
+tit <- "GFDL RCP2p6 Chl (1950-2100 Change)"
 gg_chl[[1]] <- plotChlTimeseries(d1, d2, tit)
 rm(d1, d2)
 
-d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ipsl-cm6a-lr_picontrol_tos_onedeg_global_annual_1950_2014_withZooMSS.rds")
-d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ipsl-cm6a-lr_picontrol_tos_onedeg_global_annual_2015_2100_withZooMSS.rds")
-tit <- "IPSL PRE-INDUSTRIAL Chl (1950-2100 Change)"
+d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Input/Oyr_IPSL-CM5A-LR_historical_r1i1p1_onedeg_1950-2005_withZooMSS.rds")
+d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Input/Oyr_IPSL-CM5A-LR_rcp26_r1i1p1_onedeg_2006-2100_withZooMSS.rds")
+tit <- "IPSL RCP2p6 Chl (1950-2100 Change)"
 gg_chl[[2]] <- plotChlTimeseries(d1, d2, tit)
 rm(d1, d2)
 
-d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/gfdl-esm4_historical_tos_onedeg_global_annual_1950_2014_withZooMSS.rds")
-d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/gfdl-esm4_ssp126_tos_onedeg_global_annual_2015_2100_withZooMSS.rds")
-tit <- "GFDL SSP126 Chl (1950-2100 Change)"
+d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Input/Oyr_GFDL-ESM2M_historical_r1i1p1_onedeg_1950-2005_withZooMSS.rds")
+d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Input/Oyr_GFDL-ESM2M_rcp85_r1i1p1_onedeg_2006-2100_withZooMSS.rds")
+tit <- "GFDL RCP8p5 Chl (1950-2100 Change)"
 gg_chl[[3]] <- plotChlTimeseries(d1, d2, tit)
 rm(d1, d2)
 
-d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ipsl-cm6a-lr_historical_tos_onedeg_global_annual_1950_2014_withZooMSS.rds")
-d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ipsl-cm6a-lr_ssp126_tos_onedeg_global_annual_2015_2100_withZooMSS.rds")
-tit <- "IPSL SSP126 Chl (1950-2100 Change)"
+d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Input/Oyr_IPSL-CM5A-LR_historical_r1i1p1_onedeg_1950-2005_withZooMSS.rds")
+d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5/Input/Oyr_IPSL-CM5A-LR_rcp85_r1i1p1_onedeg_2006-2100_withZooMSS.rds")
+tit <- "IPSL RCP8p5 Chl (1950-2100 Change)"
 gg_chl[[4]] <- plotChlTimeseries(d1, d2, tit)
-rm(d1, d2)
-
-d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/gfdl-esm4_historical_tos_onedeg_global_annual_1950_2014_withZooMSS.rds")
-d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/gfdl-esm4_ssp585_tos_onedeg_global_annual_2015_2100_withZooMSS.rds")
-tit <- "GFDL SSP585 Chl (1950-2100 Change)"
-gg_chl[[5]] <- plotChlTimeseries(d1, d2, tit)
-rm(d1, d2)
-
-d1 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ipsl-cm6a-lr_historical_tos_onedeg_global_annual_1950_2014_withZooMSS.rds")
-d2 <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/Phase1/Output/ipsl-cm6a-lr_ssp585_tos_onedeg_global_annual_2015_2100_withZooMSS.rds")
-tit <- "IPSL SSP585 Chl (1950-2100 Change)"
-gg_chl[[6]] <- plotChlTimeseries(d1, d2, tit)
 rm(d1, d2)
 
 
