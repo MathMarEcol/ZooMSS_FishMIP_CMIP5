@@ -4,10 +4,8 @@ library(lubridate)
 # After running this, files are to be uploaded to:
 # /work/bb0820/ISIMIP/ISIMIP2b/UploadArea/marine-fishery_global/ZooMSS/_tmp
 
-
-#FILENAME EXAMPLE
-# macroecological_gfdl-esm2m_nobc_rcp2p6_wo-diaz_no-fishing_no-oa_b10cm_global_annual_2006_2100.nc4
-#          zoomss_gfdl-esm2m_nobc_rcp26_wo-diaz_no-fishing_no-oa_b10cm_global_annual_2006_2100.nc4
+# FILENAME
+# <modelname>_<gcm>_<bias-correction>_<climate-scenario>_<soc‐scenario>_<co2sens‐scenarios>_<variable>_<region>_<timestep>_<start‐year>_<end‐year>.nc4
 
 base_dir <- paste0("~",.Platform$file.sep,
                    "Nextcloud",.Platform$file.sep,
@@ -19,12 +17,12 @@ o_modelname <- "ZooMSS"
 o_gcm <- c("IPSL-CM5A-LR", "GFDL-ESM2M")
 o_biascorrection <- "nobc"
 o_climatescenario <- c("historical", "rcp26", "rcp85")
-o_savescenario <- c("historical", "future", "future")
-o_socscenario <- "wo-diaz_no-fishing"
-o_co2sensscenarios <- "no-oa"
+o_socscenario <- "nosoc"
+o_co2sensscenarios <- "co2"
 o_variable <- c("tsb", "tpb", "tcb", "b10cm", "b30cm")
 o_region <- "global"
 o_timestep <- "annual"
+o_savescenario <- c("historical", "future", "future")
 
 # m <- s <- f <- 1
 
@@ -105,7 +103,6 @@ for (m in 1:length(o_gcm)){
       latdim <- ncdim_def("lat", "degrees_north", as.double(lat), create_dimvar = TRUE)
       timedim <- ncdim_def("time", "days since 1850-01-01 00:00:00", as.double(days), unlim = TRUE, calendar = "standard")
 
-
       # define variables
       fillvalue <- 1e20
 
@@ -144,14 +141,13 @@ for (m in 1:length(o_gcm)){
         ncatt_put(ncout,"lat","long_name", "latitude")
         ncatt_put(ncout,"time","axis","T")
 
-
         # add global attributes
         ncatt_put(ncout, 0, "author", "Created by Jason Everett <Jason.Everett@uq.edu.au>")
         ncatt_put(ncout, 0, "institution", "University of Queensland, Australia")
         ncatt_put(ncout, 0, "ModelOwners", "Jason D. Everett, Ryan F. Heneghan, Anthony J. Richardson, Patrick J. Sykes")
         ncatt_put(ncout, 0, "date_created", now())
         ncatt_put(ncout, 0, "comments", "ZooMSS model output for ISIMIP2b experimental protocol")
-        ncatt_put(ncout, 0, "Assumed Mixed Layer Depth", "60 m")
+        # ncatt_put(ncout, 0, "Assumed Mixed Layer Depth", "60 m")
 
         # close the file, writing data to disk
         nc_close(ncout)
