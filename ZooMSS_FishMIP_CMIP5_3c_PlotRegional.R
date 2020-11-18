@@ -1,9 +1,12 @@
+# Script to plot the regional output of the CMIP5 FishMIP models.
+#
+# Jason D. Everett (UQ)
+# Last Updated: 18th November 2020
 
 library(tidyverse)
 library(patchwork)
 
 dat <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Global_Model_Figures/regional_v_global_data_wZooMSS.RDS")
-
 
 base_dir <- "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Output/"
 
@@ -38,12 +41,12 @@ for (o in 1:length(scenario)){
             out$dbpm <- NA
           }
 
-
+          # Now calculate difference from mean of first 10 years
           out <- out %>%
             pivot_longer(cols = 2:dim(out)[2], values_to = "Biomass", names_to = "Model") %>%
             group_by(Model) %>%
-            mutate(mn = mean(Biomass[1:10]),
-                   delta_tcb = ((Biomass-mn)/Biomass) + 1)
+            mutate(mn = mean(Biomass[1:10]), # Calculate mean of first 10 years
+                   delta_tcb = ((Biomass-mn)/Biomass) + 1) # Calculate difference.
 
           gg[[cnt]] <- ggplot(data = out, mapping = aes(x = Date..yyyy., y = delta_tcb, colour = Model)) +
             geom_line(size = 0.6) +
@@ -53,19 +56,18 @@ for (o in 1:length(scenario)){
             xlim(1975,2100)
           rm(out)
         }
-
     }
   }
 }
 
 graphics.off()
-x11(width = 12, height = 12)
+x11(width = 12, height = 12) # Can comment this out if you don't use X11
 wrap_plots(gg, ncol = 2, byrow = TRUE, guides = "collect")
 ggsave("Figures/CMIP5_ModelComparison.pdf")
 
 
-# Look at Enviro Data Differences
 
+## Look at model differences in Environmental Data
 
 cnt = 0
 gg <- list()
