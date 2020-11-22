@@ -1,14 +1,15 @@
 # rm(list = ls())
 
 # setwd("~/Desktop/Papers/FishMIP_RegionalvsGlobal")
-source("./Figures/multi-model_plot.R")
+source("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/multi-model_plot.R")
 ## Plot regional v global comparison plots of mem output and esm model env var output
 
+library(reshape2)
 library(raster) # For global maps
-# library(abind)
-# library(egg)
+library(abind)
+library(ggplot2)
+library(egg)
 library(ncdf4)
-library(tidyverse)
 
 regions_global <- c("Baltic_Sea", "Cook_Strait", "East_Bass_Strait", "Humboldt", "Mediterranean",
             "North_Sea", "SE_Australia")
@@ -28,29 +29,26 @@ fishing_mods <- c("fishing", "no-fishing")
 clim_scens_mems <- c("hist", "rcp8p5")
 clim_scens_esms <- c("hist", "rcp85")
 
-dat <- read_rds("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Global_Model_Figures/regional_v_global_data_wZooMSS.RDS")
-
-
 
 ## Regional model files total consumer biomass
-gfdl_regional_nofishing_hist <- read.csv(list.files(path = "./All_Regional_Models/gfdl-esm2m/no-fishing/", pattern = "hist", full.names = TRUE))
-gfdl_regional_fishing_hist <- read.csv(list.files(path = "./All_Regional_Models/gfdl-esm2m/fishing/", pattern = "hist", full.names = TRUE)[2])
-gfdl_regional_nofishing_rcp85 <- read.csv(list.files(path = "./All_Regional_Models/gfdl-esm2m/no-fishing/", pattern = "rcp8p5", full.names = TRUE))
-gfdl_regional_fishing_rcp85 <- read.csv(list.files(path = "./All_Regional_Models/gfdl-esm2m/fishing/", pattern = "rcp8p5", full.names = TRUE)[2])
+gfdl_regional_nofishing_hist <- read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/gfdl-esm2m/no-fishing/", pattern = "hist", full.names = TRUE))
+gfdl_regional_fishing_hist <- read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/gfdl-esm2m/fishing/", pattern = "hist", full.names = TRUE)[2])
+gfdl_regional_nofishing_rcp85 <- read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/gfdl-esm2m/no-fishing/", pattern = "rcp8p5", full.names = TRUE))
+gfdl_regional_fishing_rcp85 <- read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/gfdl-esm2m/fishing/", pattern = "rcp8p5", full.names = TRUE)[2])
 
 gfdl_regional_nofishing <- abind(gfdl_regional_nofishing_hist, gfdl_regional_nofishing_rcp85, along = 1)
 gfdl_regional_fishing <- abind(gfdl_regional_fishing_hist, gfdl_regional_fishing_rcp85, along = 1)
 
-ipsl_regional_nofishing_hist <- read.csv(list.files(path = "./All_Regional_Models/ipsl-cm5a-lr/no-fishing/", pattern = "hist", full.names = TRUE))
-ipsl_regional_fishing_hist <- read.csv(list.files(path = "./All_Regional_Models/ipsl-cm5a-lr/fishing/", pattern = "hist", full.names = TRUE)[2])
-ipsl_regional_nofishing_rcp85 <- read.csv(list.files(path = "./All_Regional_Models/ipsl-cm5a-lr/no-fishing/", pattern = "rcp8p5", full.names = TRUE))
-ipsl_regional_fishing_rcp85 <- read.csv(list.files(path = "./All_Regional_Models/ipsl-cm5a-lr/fishing/", pattern = "rcp8p5", full.names = TRUE)[2])
+ipsl_regional_nofishing_hist <- read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/ipsl-cm5a-lr/no-fishing/", pattern = "hist", full.names = TRUE))
+ipsl_regional_fishing_hist <- read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/ipsl-cm5a-lr/fishing/", pattern = "hist", full.names = TRUE)[2])
+ipsl_regional_nofishing_rcp85 <- read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/ipsl-cm5a-lr/no-fishing/", pattern = "rcp8p5", full.names = TRUE))
+ipsl_regional_fishing_rcp85 <- read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/ipsl-cm5a-lr/fishing/", pattern = "rcp8p5", full.names = TRUE)[2])
 
 ipsl_regional_nofishing <- abind(ipsl_regional_nofishing_hist, ipsl_regional_nofishing_rcp85, along = 1)
 ipsl_regional_fishing <- abind(ipsl_regional_fishing_hist, ipsl_regional_fishing_rcp85, along = 1)
 
-gfdlr_regional_nofishing <- as.data.frame(read.csv(list.files(path = "./All_Regional_Models/gfdl-reanalysis/no-fishing/", pattern = "hist", full.names = TRUE)))
-gfdlr_regional_fishing <- as.data.frame(read.csv(list.files(path = "./All_Regional_Models/gfdl-reanalysis/fishing/", pattern = "hist", full.names = TRUE)[2]))
+gfdlr_regional_nofishing <- as.data.frame(read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/gfdl-reanalysis/no-fishing/", pattern = "hist", full.names = TRUE)))
+gfdlr_regional_fishing <- as.data.frame(read.csv(list.files(path = "/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/gfdl-reanalysis/fishing/", pattern = "hist", full.names = TRUE)[2]))
 
 
 
@@ -64,18 +62,18 @@ for(i in 1:length(regions_global)){
   ################################################
   #### ENVIRONMENTAL VARIABLE PLOTS
   ## Import and process environmental variables
-  hist_npp <- read.csv(list.files(path = paste("./Regional/Input_Data/MultiModel/",curr_region,'/', sep = ""), pattern = glob2rx("hist*intpp*"), full.names = TRUE))
+  hist_npp <- read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Input_Data/MultiModel/",curr_region,'/', sep = ""), pattern = glob2rx("hist*intpp*"), full.names = TRUE))
   hist_npp <- hist_npp[c(which(hist_npp$Date..yyyy. == region_startyear[i]):dim(hist_npp)[1]),]
-  rcp85_npp <- read.csv(list.files(path = paste("./Regional/Input_Data/MultiModel/",curr_region,'/', sep = ""), pattern = glob2rx("rcp85*intpp*"), full.names = TRUE))
+  rcp85_npp <- read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Input_Data/MultiModel/",curr_region,'/', sep = ""), pattern = glob2rx("rcp85*intpp*"), full.names = TRUE))
   rcp85_npp <- rcp85_npp[c(1:which(rcp85_npp$Date..yyyy. == region_endyear[i])),]
   reanalysis_npp <- hist_npp[,c(1,4)]
   reanalysis_npp[,2] <- reanalysis_npp[,2]*(12*60*60*24) # Convert from mol C m-2 s-1 to g C m-2 d-1
   ipsl_gfdl_npp <- abind(hist_npp[,c(1,2,3)], rcp85_npp[,c(1,2,3)], along = 1)
   ipsl_gfdl_npp[,c(2,3)] <- ipsl_gfdl_npp[,c(2,3)]*(12*60*60*24) # Convert from mol C m-2 s-1 to g C m-2 d-1
 
-  hist_temp <- read.csv(list.files(path = paste("./Regional/Input_Data/MultiModel/",curr_region,'/', sep = ""), pattern = glob2rx("hist*sst*"), full.names = TRUE))
+  hist_temp <- read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Input_Data/MultiModel/",curr_region,'/', sep = ""), pattern = glob2rx("hist*sst*"), full.names = TRUE))
   hist_temp <- hist_temp[c(which(hist_temp$Date..yyyy. == region_startyear[i]):dim(hist_temp)[1]),]
-  rcp85_temp <- read.csv(list.files(path = paste("./Regional/Input_Data/MultiModel/",curr_region,'/', sep = ""), pattern = glob2rx("rcp85*sst*"), full.names = TRUE))
+  rcp85_temp <- read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Input_Data/MultiModel/",curr_region,'/', sep = ""), pattern = glob2rx("rcp85*sst*"), full.names = TRUE))
   rcp85_temp <- rcp85_temp[c(1:which(rcp85_temp$Date..yyyy. == region_endyear[i])),]
   reanalysis_temp <- hist_temp[,c(1,4)]
   ipsl_gfdl_temp <- abind(hist_temp[,c(1,2,3)], rcp85_temp[,c(1,2,3)], along = 1)
@@ -125,7 +123,7 @@ for(i in 1:length(regions_global)){
     ylim(c(min(rel_rean_temp$GFDL_Reanalysis, na.rm = TRUE)*.9, max(rel_rean_temp$GFDL_Reanalysis, na.rm = TRUE)*1.1))
 
 
-  ggsave(filename = paste("./Figures/", curr_region, "_env_vars_GFDL-Reanalysis.png", sep =""), plot = ggarrange(plots = list(intpp_abs, temp_abs, intpp_rel, temp_rel), nrow =2, top = paste(region_savename[i], " GFDL-Reanalysis")), width = 9, height = 7)
+  ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/", curr_region, "_env_vars_GFDL-Reanalysis.png", sep =""), plot = ggarrange(plots = list(intpp_abs, temp_abs, intpp_rel, temp_rel), nrow =2, top = paste(region_savename[i], " GFDL-Reanalysis")), width = 9, height = 7)
 
 
   ################################################################
@@ -200,7 +198,7 @@ for(i in 1:length(regions_global)){
     ylim(c(min(rel_ig_temp$Rel_Temp, na.rm = TRUE)*.9, max(rel_ig_temp$Rel_Temp, na.rm = TRUE)*1.1))
 
 
-  ggsave(filename = paste("./Figures/", curr_region, "_env_vars_ipsl_gfdl.png", sep =""), plot = ggarrange(plots = list(intpp_abs, temp_abs, intpp_rel, temp_rel), nrow =2, top = paste(region_savename[i], " GFDL-ESM2M & IPSL-CM6A-LR")), width = 9, height = 7)
+  ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/", curr_region, "_env_vars_ipsl_gfdl.png", sep =""), plot = ggarrange(plots = list(intpp_abs, temp_abs, intpp_rel, temp_rel), nrow =2, top = paste(region_savename[i], " GFDL-ESM2M & IPSL-CM6A-LR")), width = 9, height = 7)
 
 
   ############################################################
@@ -242,7 +240,7 @@ for(i in 1:length(regions_global)){
   # IPSL-CM6A-LR fishing
   plot_list[[4]] = rel_line(curr_regional_ipsl_fishing, plot_legend = NA, name = NA, standin = "ttt", subtitlee = "Fishing", lcols = "black", set_cols = NA,xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
 
-  ggsave(filename = paste("./Figures/tcb_", curr_region, "_regionalmodels_gfdl-ipsl.png", sep =""), plot = ggarrange(plots = plot_list[c(1:4)], nrow =2, top = region_savename[i], byrow = FALSE), width = 9, height = 7)
+  ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/tcb_", curr_region, "_regionalmodels_gfdl-ipsl.png", sep =""), plot = ggarrange(plots = plot_list[c(1:4)], nrow =2, top = region_savename[i], byrow = FALSE), width = 9, height = 7)
 
   # GFDL-Reanalysis fishing
   plot_list[[5]] = rel_line(curr_regional_gr_nofishing, plot_legend = NA, name = "GFDL-Reanalysis", standin = "ttt", subtitlee = "No Fishing", lcols = "black", set_cols = NA,xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
@@ -250,48 +248,56 @@ for(i in 1:length(regions_global)){
   # GFDL-Reanalysis no-fishing
   plot_list[[6]] = rel_line(curr_regional_gr_fishing, plot_legend = NA, name = "GFDL-Reanlysis", standin = "ttt", subtitlee = "Fishing", lcols = "black", set_cols = NA,xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
 
-  ggsave(filename = paste("./Figures/tcb_", curr_region, "_regionalmodels_gfdlr.png", sep =""), plot = ggarrange(plots = plot_list[c(5,6)], nrow =2, top = region_savename[i], font.label()), width = 5, height = 7)
+  ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/tcb_", curr_region, "_regionalmodels_gfdlr.png", sep =""), plot = ggarrange(plots = plot_list[c(5,6)], nrow =2, top = region_savename[i], font.label()), width = 5, height = 7)
 
   ############################################################
   #### GLOBAL MODEL TCB PLOTS
-  ipsl_global_nofishing_hist <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "hist_ipsl", full.names = TRUE)))
-  ipsl_global_nofishing_rcp85 <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "rcp8p5_ipsl", full.names = TRUE)))
+  ipsl_global_nofishing_hist <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "hist_ipsl", full.names = TRUE)))
+  ipsl_global_nofishing_hist$zooms <- read.csv(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Output/ipsl-cm5a-lr/zoomss_ipsl-cm5a-lr_nobc_historical_wo-diaz_no-fishing_no-oa_",regions_global[i],"_annual_1950_2005.csv"))$tcb
+
+  ipsl_global_nofishing_rcp85 <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "rcp8p5_ipsl", full.names = TRUE)))
+  ipsl_global_nofishing_rcp85$zooms <- read.csv(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Output/ipsl-cm5a-lr/zoomss_ipsl-cm5a-lr_nobc_rcp85_wo-diaz_no-fishing_no-oa_",regions_global[i],"_annual_2006_2100.csv"))$tcb
+
   ipsl_global_nofishing <- rbind(ipsl_global_nofishing_hist, ipsl_global_nofishing_rcp85)
   ipsl_global_nofishing[c((dim(ipsl_global_nofishing)[1]-5):dim(ipsl_global_nofishing)[1]),-1] <- NA
   ipsl_global_nofishing <- ipsl_global_nofishing[c(which(ipsl_global_nofishing$Date..yyyy. == region_startyear[i]):dim(ipsl_global_nofishing)[1]),]
   ipsl_global_nofishing <- ipsl_global_nofishing[c(1:which(ipsl_global_nofishing$Date..yyyy. == region_endyear[i])),]
 
-  ipsl_global_fishing_hist <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "hist_ipsl", full.names = TRUE)))
-  ipsl_global_fishing_rcp85 <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "rcp8p5_ipsl", full.names = TRUE)))
+  ipsl_global_fishing_hist <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "hist_ipsl", full.names = TRUE)))
+  ipsl_global_fishing_rcp85 <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "rcp8p5_ipsl", full.names = TRUE)))
   ipsl_global_fishing <- rbind(ipsl_global_fishing_hist, ipsl_global_fishing_rcp85)
   ipsl_global_fishing[c((dim(ipsl_global_fishing)[1]-5):dim(ipsl_global_fishing)[1]),-1] <- NA
   ipsl_global_fishing <- ipsl_global_fishing[c(which(ipsl_global_fishing$Date..yyyy. == region_startyear[i]):dim(ipsl_global_fishing)[1]),]
   ipsl_global_fishing <- ipsl_global_fishing[c(1:which(ipsl_global_fishing$Date..yyyy. == region_endyear[i])),]
 
-  gfdl_global_nofishing_hist <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "hist_gfdl-esm2m", full.names = TRUE)))
-  gfdl_global_nofishing_rcp85 <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "rcp8p5_gfdl-esm2m", full.names = TRUE)))
+  gfdl_global_nofishing_hist <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "hist_gfdl-esm2m", full.names = TRUE)))
+  gfdl_global_nofishing_hist$zooms <- read.csv(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Output/gfdl-esm2m/zoomss_gfdl-esm2m_nobc_historical_wo-diaz_no-fishing_no-oa_",regions_global[i],"_annual_1950_2005.csv"))$tcb
+
+  gfdl_global_nofishing_rcp85 <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "rcp8p5_gfdl-esm2m", full.names = TRUE)))
+  gfdl_global_nofishing_rcp85$zooms <- read.csv(paste0("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Output/gfdl-esm2m/zoomss_gfdl-esm2m_nobc_rcp85_wo-diaz_no-fishing_no-oa_",regions_global[i],"_annual_2006_2100.csv"))$tcb
+
   gfdl_global_nofishing <- rbind(gfdl_global_nofishing_hist, gfdl_global_nofishing_rcp85)
   gfdl_global_nofishing[c((dim(gfdl_global_nofishing)[1]-5):dim(gfdl_global_nofishing)[1]),-1] <- NA
   gfdl_global_nofishing <- gfdl_global_nofishing[c(which(gfdl_global_nofishing$Date..yyyy. == region_startyear[i]):dim(gfdl_global_nofishing)[1]),]
   gfdl_global_nofishing <- gfdl_global_nofishing[c(1:which(gfdl_global_nofishing$Date..yyyy. == region_endyear[i])),]
 
-  gfdl_global_fishing_hist <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "hist_gfdl-esm2m", full.names = TRUE)))
-  gfdl_global_fishing_rcp85 <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "rcp8p5_gfdl-esm2m", full.names = TRUE)))
+  gfdl_global_fishing_hist <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "hist_gfdl-esm2m", full.names = TRUE)))
+  gfdl_global_fishing_rcp85 <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "rcp8p5_gfdl-esm2m", full.names = TRUE)))
   gfdl_global_fishing <- rbind(gfdl_global_fishing_hist, gfdl_global_fishing_rcp85)
   gfdl_global_fishing[c((dim(gfdl_global_fishing)[1]-5):dim(gfdl_global_fishing)[1]),-1] <- NA
   gfdl_global_fishing <- gfdl_global_fishing[c(which(gfdl_global_fishing$Date..yyyy. == region_startyear[i]):dim(gfdl_global_fishing)[1]),]
   gfdl_global_fishing <- gfdl_global_fishing[c(1:which(gfdl_global_fishing$Date..yyyy. == region_endyear[i])),]
 
-  gfdlr_global_nofishing <-as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "hist_gfdl-reanalysis", full.names = TRUE)))
+  gfdlr_global_nofishing <-as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/no-fishing/", regions_global[i], '/',sep = ""), pattern = "hist_gfdl-reanalysis", full.names = TRUE)))
   gfdlr_global_nofishing <- gfdlr_global_nofishing[c(which(gfdlr_global_nofishing$Date..yyyy. == region_startyear[i]):dim(gfdlr_global_nofishing)[1]),]
   gfdlr_global_nofishing <- gfdlr_global_nofishing[-dim(gfdlr_global_nofishing)[1],]
 
-  gfdlr_global_fishing <- as.data.frame(read.csv(list.files(path = paste("./Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "hist_gfdl-reanalysis", full.names = TRUE)))
+  gfdlr_global_fishing <- as.data.frame(read.csv(list.files(path = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Regional/Output_Data/MultiModel/fishing/", regions_global[i], '/',sep = ""), pattern = "hist_gfdl-reanalysis", full.names = TRUE)))
   gfdlr_global_fishing <- gfdlr_global_fishing[c(which(gfdlr_global_fishing$Date..yyyy. == region_startyear[i]):dim(gfdlr_global_fishing)[1]),]
   gfdlr_global_fishing <- gfdlr_global_fishing[-dim(gfdlr_global_fishing)[1],]
 
   ### GFDL-ESM2M No Fishing
-  model_colors <- c("boats" = "green", "apecosm" = "red", "ecoocean" = "blue", "dbem" = "cyan", "dbpm" = "purple", "macroecological" = "orange", "Mean" = "black")
+  model_colors <- c("boats" = "green", "apecosm" = "red", "ecoocean" = "blue", "dbem" = "cyan", "dbpm" = "purple", "macroecological" = "orange", "zooms" = "brown", "Mean" = "black")
   plot_list = list()
   plot_list[[1]] = rel_line(gfdl_global_nofishing, plot_legend = NA, name = "GFDL-ESM2M", standin = "ttt", subtitlee = "No Fishing", lcols = rainbow(c(dim(gfdl_global_nofishing)[2])), set_cols = model_colors, xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
 
@@ -304,7 +310,7 @@ for(i in 1:length(regions_global)){
   ### IPSL-CM5A-LR Fishing
   plot_list[[4]] = rel_line(ipsl_global_fishing, plot_legend = "Model", name = NA, standin = "ttt", subtitlee = "Fishing", lcols = rainbow(c(dim(ipsl_global_nofishing)[2])), set_cols = model_colors, xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
 
-  ggsave(filename = paste("./Figures/tcb_", curr_region, "_globalmodels_gfdl-ipsl.png", sep =""), plot = ggarrange(plots = plot_list[c(1:4)], nrow =2, top = region_savename[i], byrow = FALSE, common.legend = TRUE), width = 9, height = 7)
+  ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/tcb_", curr_region, "_globalmodels_gfdl-ipsl.png", sep =""), plot = ggarrange(plots = plot_list[c(1:4)], nrow =2, top = region_savename[i], byrow = FALSE, common.legend = TRUE), width = 9, height = 7)
 
   model_colors <- c("boats" = "green",  "ecoocean" = "blue",  "macroecological" = "orange", "Mean" = "black")
   ### GFDL-Reanalysis No Fishing
@@ -313,7 +319,7 @@ for(i in 1:length(regions_global)){
   ### GFDL-Reanalysis Fishing
   plot_list[[6]] = rel_line(gfdlr_global_fishing, plot_legend = "Model", name = NA, standin = "ttt", subtitlee = "Fishing", lcols = rainbow(c(dim(ipsl_global_nofishing)[2])), set_cols = model_colors, xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
 
-  ggsave(filename = paste("./Figures/tcb_", curr_region, "_globalmodels_gfdlreanalysis.png", sep =""), plot = ggarrange(plots = plot_list[c(5:6)], nrow =2, top = region_savename[i], byrow = FALSE, common.legend = TRUE), width = 5, height = 7)
+  ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/tcb_", curr_region, "_globalmodels_gfdlreanalysis.png", sep =""), plot = ggarrange(plots = plot_list[c(5:6)], nrow =2, top = region_savename[i], byrow = FALSE, common.legend = TRUE), width = 5, height = 7)
 
 
 
@@ -414,7 +420,7 @@ plot_list[[4]] <-  ggplot() + geom_ribbon(data = ipsl_fishing_combined, aes(x = 
   xlab('Year') + ylab(expression(paste(Delta, " Consumer Biomass", sep = ""))) + labs(subtitle = "Fishing")
 
 
-ggsave(filename = paste("./Figures/tcb_", curr_region, "_global_regional_models_gfdl-ipsl.png", sep =""), plot = ggarrange(plots = plot_list[c(1:4)], nrow =2, top = region_savename[i], byrow = FALSE, common.legend = TRUE), width = 9, height = 7)
+ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/tcb_", curr_region, "_global_regional_models_gfdl-ipsl.png", sep =""), plot = ggarrange(plots = plot_list[c(1:4)], nrow =2, top = region_savename[i], byrow = FALSE, common.legend = TRUE), width = 9, height = 7)
 
 # GFDL-reanalysis no fishing
 plot_list[[5]] <-  ggplot() + geom_ribbon(data = gfdlr_nofishing_combined, aes(x = Date, ymin = Lower_95CI_Global, ymax = Upper_95CI_Global, fill = "95%_CI_Global_Models"))+
@@ -442,15 +448,15 @@ plot_list[[6]] <-  ggplot() + geom_ribbon(data = gfdlr_fishing_combined, aes(x =
         plot.title = element_blank())+
   xlab('Year') + ylab(expression(paste(Delta, " Consumer Biomass", sep = ""))) + labs(subtitle = "Fishing")
 
-ggsave(filename = paste("./Figures/tcb_", curr_region, "_global_regional_models_gfdlreanalysis.png", sep =""), plot = ggarrange(plots = plot_list[c(5:6)], nrow =2, top = region_savename[i], byrow = FALSE, common.legend = TRUE), width = 5, height = 7)
-  }
+ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/tcb_", curr_region, "_global_regional_models_gfdlreanalysis.png", sep =""), plot = ggarrange(plots = plot_list[c(5:6)], nrow =2, top = region_savename[i], byrow = FALSE, common.legend = TRUE), width = 5, height = 7)
+}
 
 
 ### KEY RUNS
 model_colors <- c("key.run" = "green", "ipsl" = "red", "gfdl" = "blue", "gfdlr" = "cyan", "Mean" = NA)
 plot_list1 = plot_list2 = list()
 
-regional_runs <- read.csv("./All_Regional_Models/key-runs/all regions sorted and cleaned with GCM-scenario2_with-key-runs 1970-2100 July 18 2019.csv")
+regional_runs <- read.csv("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/key-runs/all regions sorted and cleaned with GCM-scenario2_with-key-runs 1970-2100 July 18 2019.csv")
 key_runs <- regional_runs[regional_runs$GCM_scenario == "key-run",]
 
 cs_key_tcb_fishing <- key_runs[which(key_runs$region == "cook-strait" & key_runs$exploitation == "fishing" & key_runs$variable == "tcb"),]
@@ -509,13 +515,13 @@ plot_list1[[3]] = rel_line(data = ns_regional_nofishing, plot_legend = NA, name 
 plot_list2[[3]] = rel_line(data = ns_regional_fishing, plot_legend = NA, name = NA, standin = "ttt", subtitlee = "North Sea", lcols = model_colors, set_cols = model_colors, xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
 
 
-med_key_tcb_fishing <- colMeans(matrix(ncvar_get(nc_open("./All_Regional_Models/key-runs/ewe_key-run_nobc_hist_wo-diaz_fishing_no-oa_tcb_med-glob_monthly_1970_2005.nc4"),"tcb"), nrow = 12))
+med_key_tcb_fishing <- colMeans(matrix(ncvar_get(nc_open("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/key-runs/ewe_key-run_nobc_hist_wo-diaz_fishing_no-oa_tcb_med-glob_monthly_1970_2005.nc4"),"tcb"), nrow = 12))
 med_regional_fishing <- data.frame("year" = 1975:2005, "key-run" = med_key_tcb_fishing[-c(1:5)],
                                   "ipsl" = ipsl_regional_fishing_hist[which(ipsl_regional_fishing_hist[,"Date..yyyy."] == 1975):dim(ipsl_regional_fishing_hist)[1],"med.glob"],
                                   "gfdl" = gfdl_regional_fishing_hist[which(gfdl_regional_fishing_hist[,"Date..yyyy."] == 1975):dim(gfdl_regional_fishing_hist)[1],"med.glob"],
                                   "gfdlr" = gfdlr_regional_fishing[which(gfdlr_regional_fishing[,"Date..yyyy."] == 1975):dim(gfdlr_regional_fishing)[1],"med.glob"])
 
-med_key_tcb_nofishing <- colMeans(matrix(ncvar_get(nc_open("./All_Regional_Models/key-runs/ewe_key-run_nobc_hist_wo-diaz_no-fishing_no-oa_tcb_med-glob_monthly_1970_2005.nc4"),"tcb"), nrow = 12))
+med_key_tcb_nofishing <- colMeans(matrix(ncvar_get(nc_open("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/All_Regional_Models/key-runs/ewe_key-run_nobc_hist_wo-diaz_no-fishing_no-oa_tcb_med-glob_monthly_1970_2005.nc4"),"tcb"), nrow = 12))
 med_regional_nofishing <- data.frame("year" = 1975:2005, "key-run" = med_key_tcb_nofishing[-c(1:5)],
                                    "ipsl" = ipsl_regional_nofishing_hist[which(ipsl_regional_nofishing_hist[,"Date..yyyy."] == 1975):dim(ipsl_regional_nofishing_hist)[1],"med.glob"],
                                    "gfdl" = gfdl_regional_nofishing_hist[which(gfdl_regional_nofishing_hist[,"Date..yyyy."] == 1975):dim(gfdl_regional_nofishing_hist)[1],"med.glob"],
@@ -525,8 +531,8 @@ med_regional_nofishing <- data.frame("year" = 1975:2005, "key-run" = med_key_tcb
 plot_list1[[4]] = rel_line(data = med_regional_nofishing, plot_legend = "Model", name = NA, standin = "ttt", subtitlee = "Mediterranean", lcols = model_colors, set_cols = model_colors, xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
 plot_list2[[4]] = rel_line(data = med_regional_fishing, plot_legend = "Model", name = NA, standin = "ttt", subtitlee = "Mediterranean", lcols = model_colors, set_cols = model_colors, xlabb = "Year", ylabb = expression(paste(Delta, " Consumer Biomass", sep = "")))
 
-ggsave(filename = paste("./Figures/tcb_nofishing_regional_models_all.png", sep =""), plot = ggarrange(plots = plot_list1, nrow =2,  byrow = FALSE, top = "All Regional Models tcb No Fishing", common.legend = TRUE), width = 9, height = 7)
-ggsave(filename = paste("./Figures/tcb_fishing_regional_models_all.png", sep =""), plot = ggarrange(plots = plot_list2, nrow =2,  byrow = FALSE, top = "All Regional Models tcb Fishing"), width = 9, height = 7)
+ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/tcb_nofishing_regional_models_all.png", sep =""), plot = ggarrange(plots = plot_list1, nrow =2,  byrow = FALSE, top = "All Regional Models tcb No Fishing", common.legend = TRUE), width = 9, height = 7)
+ggsave(filename = paste("/Users/jason/Nextcloud/MME2Work/FishMIP/CMIP5_RegionalCompare/Ryan/Figures/tcb_fishing_regional_models_all.png", sep =""), plot = ggarrange(plots = plot_list2, nrow =2,  byrow = FALSE, top = "All Regional Models tcb Fishing"), width = 9, height = 7)
 
 
 
